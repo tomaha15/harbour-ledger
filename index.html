@@ -41,6 +41,10 @@ nav button span{font-size:22px;line-height:1}
 nav button:active{transform:translateY(3px);box-shadow:0 0 0 var(--brass)}
 nav button.on{background:var(--brass);color:var(--bg);box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .hold{cursor:pointer}.hold:active{opacity:.6}
+.dr{background:var(--card);border-left:4px solid var(--brass);padding:10px 12px;margin:14px 0;border-radius:3px}
+.dr>b:first-child{display:block;font-family:Fraunces,Georgia,serif;font-size:17px;margin-bottom:4px}
+.rr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.rr:last-child{border-bottom:0}.rr small{display:block;color:var(--mu);font-size:13px}.rr.tot{font-weight:600}
 #rep{margin-bottom:20px}.slip{margin:18px 0}
 .hl,.fl2,#upg-h{scroll-margin-top:28px}
 .slip.lock{flex-direction:column;align-items:stretch;gap:4px}
@@ -176,6 +180,7 @@ function endDay(){
  }
  for(const k in C)if(!unl().includes(k)){S.prev[k]=S.p[k]}
  const w=Math.min(S.cash,wage());S.cash-=w;
+ S.rep={day:S.day+1,w,rows:unl().filter(k=>S.inv[k]>0).map(k=>({k,q:S.inv[k],a:S.prev[k],b:S.p[k]}))};
  S.day++;S.msg='Day '+S.day+' prices: '+out.join(', ')+'.'+(w?' Wages paid: '+f(w)+'.':'');snd('day');dayAdvice();
  plan();S.scene='office';
  if(!S.won&&net()>=GOAL){S.won=1;S.msg='You passed '+f(GOAL)+'! You’re the top trader on the harbour. Keep going for a bigger fortune.'}
@@ -370,6 +375,13 @@ function renderTape(){
  tk.innerHTML=('<span class="cp">'+html+'</span>').repeat(3);
  tk.style.animationDuration=Math.max(20,html.replace(/<[^>]+>/g,'').length*.22)+'s';
 }
+function dayReport(){
+ const r=S.rep;
+ if(!r||r.day!==S.day)return '';
+ let tot=0;
+ const rows=r.rows.map(x=>{const d=x.q*(x.b-x.a);tot+=d;return`<div class="rr"><div>${C[x.k].e} ${C[x.k].n} × ${x.q}<small>${f(x.a)} to ${f(x.b)} (${pct(x.b/x.a-1)})</small></div><b class="${d>=0?'up':'dn'}">${d>=0?'+':'−'}${f(Math.abs(d))}</b></div>`}).join('');
+ return`<div class="dr"><b>Morning report, day ${r.day}</b>${rows||'<div class="rr"><span class="mu">You aren’t holding any stock.</span></div>'}<div class="rr tot"><span>Holdings change</span><b class="${tot>=0?'up':'dn'}">${tot>=0?'+':'−'}${f(Math.abs(tot))}</b></div>${r.w?`<div class="rr"><span>Wages paid</span><b class="dn">−${f(r.w)}</b></div>`:''}<div class="rr tot"><span>Net worth now</span><b>${f(net())}</b></div></div>`;
+}
 function repHead(){
  let h='<h3 id="rep" style="margin-top:6px">Price news report'+(S.lv.rep?' (level '+(S.lv.news+1)+')':'')+'</h3>';
  if(!S.lv.rep)h+=`<div class="slip lock"><b>🔒 Extra daily tips</b><small>Unlock extra daily tips on where prices are heading. The ticker tape below already shows some tips for free.</small><small class="need">${S.cash<REP?'You need '+f(REP-S.cash)+' more to unlock it.':'You can afford it now.'}</small><button class="go" data-a="rep"${S.cash<REP?' disabled':''}>Unlock for ${f(REP)}</button></div>`;
@@ -378,6 +390,7 @@ function repHead(){
 function office(){
  let h='<h2>Office</h2><p class="mu">Check the price news report, then trade and end the day. Slips from unreliable sources are usually wrong, but not always.</p>';
  if(S.msg)h+=`<div class="note">${S.msg}</div>`;
+ h+=dayReport();
  h+=repHead();
  if(S.lv.rep)h+=(S.rtips||[]).length?S.rtips.map(t=>`<div class="slip${t.sh?' bad':''}"><div><b>${C[t.k].e} ${NEWS[t.k][t.dir?0:1]}</b><small>${t.sh?'Unconfirmed: ':''}${t.src}</small></div><span class="ar ${t.dir?'up':'dn'}">${t.dir?'▲':'▼'}</span></div>`).join(''):'<p class="mu">No slips today.</p>';
  h+='<h3>Holdings</h3>';
