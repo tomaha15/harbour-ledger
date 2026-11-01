@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harbour Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:#e8edf2;--card:#fff;--ink:#16233a;--mu:#5d6b82;--brass:#9a6b0a;--sea:#1f7a6a;--rust:#b8432b;--line:#cfd7e2;--slip:#fbf3d9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16233a;--card:#1f3050;--ink:#eef1f4;--mu:#9db0cc;--brass:#e0b04a;--sea:#6fb7a8;--rust:#f08a6e;--line:#2f4468;--slip:#2c3a52}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 "DM Sans",system-ui,sans-serif;display:flex;flex-direction:column}
+h2,h3,.big{font-family:Fraunces,Georgia,serif;margin:0}
+h2{font-size:26px;font-weight:800}h3{font-size:18px;margin:22px 0 4px}
+.mu{color:var(--mu);margin:.3em 0 1em}
+header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:flex-end;padding:12px 16px 10px;border-bottom:2px solid var(--brass)}
+header small{display:block;color:var(--mu);font-size:12px}
+.big{font-size:28px;font-weight:800;color:var(--brass);line-height:1}
+main{flex:1;overflow-y:auto;padding:16px}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--mu);font:600 14px "DM Sans",sans-serif;padding:12px 0}
+nav button.on{color:var(--ink);box-shadow:inset 0 3px var(--brass)}
+.slip{background:var(--slip);border:1px dashed var(--brass);padding:10px 12px;margin:8px 0;border-radius:3px}
+.slip small{display:block;color:var(--mu);margin-top:2px}
+.row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row .i{font-size:28px}.row .t{flex:1;min-width:0}.row b{font-size:17px}
+.up{color:var(--sea)}.dn{color:var(--rust)}
+.btns{display:flex;gap:6px}
+button.b{border:1px solid var(--ink);background:none;color:var(--ink);border-radius:6px;padding:8px 10px;font:600 14px "DM Sans",sans-serif;min-width:44px}
+button.b:disabled{opacity:.3}
+button.go{width:100%;margin-top:12px;padding:14px;border:0;border-radius:6px;background:var(--brass);color:#fff;font:700 17px "DM Sans",sans-serif}
+.slip{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ar{font-size:26px;line-height:1}.ar.up{color:#2e9e5b}.ar.dn{color:#d63b3b}
+.slip.bad{background:transparent;border-color:var(--rust)}.slip.bad small{color:var(--rust);font-weight:600}
+.mg{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;margin:10px 0;padding:12px 14px;border:1px solid var(--brass);border-radius:6px;background:var(--card);color:var(--ink);font:600 15px "DM Sans",sans-serif;text-align:left}
+.mg span:last-child{color:var(--mu);font-weight:400;font-size:13px;text-align:right}
+.mgr{border-left:4px solid var(--brass);padding-left:12px;margin-bottom:12px}
+.btns .b{flex:1}
+nav{gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--brass)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--brass);border-radius:12px;background:var(--bg);color:var(--ink);font:700 15px "DM Sans",sans-serif;padding:8px 0;box-shadow:0 3px 0 var(--brass);transition:transform .08s,box-shadow .08s}
+nav button span{font-size:22px;line-height:1}
+nav button:active{transform:translateY(3px);box-shadow:0 0 0 var(--brass)}
+nav button.on{background:var(--brass);color:var(--bg);box-shadow:0 3px 0 rgba(0,0,0,.35)}
+.hold{cursor:pointer}.hold:active{opacity:.6}
+#rep{margin-bottom:20px}.slip{margin:18px 0}
+.hl,.fl2,#upg-h{scroll-margin-top:28px}
+.slip.lock{flex-direction:column;align-items:stretch;gap:4px}
+.slip.lock .go{margin-top:8px}.go:disabled{opacity:.45}
+.slip small.need{color:var(--brass);font-weight:600;margin-top:4px}
+#tape{flex:none;overflow:hidden;white-space:nowrap;background:var(--card);border-top:1px solid var(--line);height:32px;line-height:32px;font-size:13px}
+.tk{display:inline-block;animation:tick 40s linear infinite}
+.cp{display:inline-block;padding-right:40px}
+.ti{margin-right:30px}.ti .ar{font-size:14px;margin:0 5px}.ti i{color:var(--mu);font-style:normal;margin-left:6px}.ti.bad i{color:var(--rust);font-weight:600}
+@keyframes tick{to{transform:translateX(-33.3333%)}}
+@media(prefers-reduced-motion:reduce){.tk{animation:none}#tape{overflow-x:auto}}
+.dbg{margin-top:24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.dbg small{color:var(--mu);width:100%}
+.fl2{outline:3px solid var(--brass);outline-offset:4px;border-radius:4px;animation:flash .9s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.fl2{animation:none}}
+nav button.nudge{animation:nudge 1s ease-in-out infinite}
+@keyframes nudge{50%{background:var(--brass);color:var(--bg)}}
+@media(prefers-reduced-motion:reduce){nav button.nudge{animation:none;background:var(--brass);color:var(--bg)}}
+main{padding-bottom:90px}
+#mina{position:fixed;right:12px;bottom:calc(var(--nh,70px) + 10px);display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:5;pointer-events:none}
+#mina>*{pointer-events:auto}
+#mina:has(.hl){z-index:61}
+#fade{position:fixed;left:0;right:0;bottom:var(--nh,56px);height:48px;background:linear-gradient(transparent,var(--bg));pointer-events:none;opacity:0;transition:opacity .2s;z-index:3}
+#fade.on{opacity:1}
+#ovl{position:fixed;left:0;right:0;bottom:var(--nh,56px);height:4px;z-index:3;pointer-events:none;opacity:0;transition:opacity .45s}
+#ovl.on{opacity:1;transition:opacity .05s}
+#ovl i{display:block;height:100%;width:0;margin:0 auto;background:var(--brass);border-radius:2px;transition:width .08s linear}
+#fade:after{content:"\25BE";position:absolute;left:50%;bottom:4px;transform:translateX(-50%);color:var(--brass);font-size:16px}
+.endm{text-align:center;color:var(--mu);margin-top:28px;padding-top:16px;border-top:1px dashed var(--line);opacity:.6;transition:opacity .3s,color .3s}
+.endm.hit{opacity:1;color:var(--brass)}
+#av{position:relative;width:54px;height:54px;border-radius:50%;border:2px solid var(--brass);background:var(--card);font-size:28px;line-height:1;padding:0}
+#dot{position:absolute;top:0;right:0;width:13px;height:13px;border-radius:50%;background:var(--rust)}
+#bub{display:none;position:relative;max-width:min(78vw,300px);background:var(--card);color:var(--ink);border:2px solid var(--brass);border-radius:14px;padding:10px 12px;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+#bub.show{display:block;animation:pop .3s ease-out}
+#bub:after{content:"";position:absolute;right:22px;bottom:-9px;width:14px;height:14px;background:var(--card);border-right:2px solid var(--brass);border-bottom:2px solid var(--brass);transform:rotate(45deg)}
+#log,#mgrp{position:fixed;left:0;right:0;bottom:var(--nh,70px);max-height:55vh;overflow-y:auto;background:var(--card);border-top:2px solid var(--brass);padding:12px 16px 84px;z-index:4}
+#intro{display:block}
+#intro[hidden]{display:none}
+#intro .dim{position:fixed;inset:0;z-index:60;background:rgba(10,18,32,.74)}
+#intro .card{position:fixed;z-index:62;left:0;right:0;bottom:0;background:var(--card);border-top:3px solid var(--brass);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+.ih{display:flex;align-items:center;gap:8px}.ih .x{margin-left:auto}.av2{font-size:30px;line-height:1}
+#itx{min-height:100px;margin:8px 0;font-size:17px}
+.hl{position:relative;z-index:61;background:var(--bg);box-shadow:0 0 0 6px var(--bg);outline:3px solid var(--brass);outline-offset:6px;border-radius:4px;animation:flash .9s ease-in-out infinite}
+@keyframes flash{50%{outline-color:transparent}}
+@media(prefers-reduced-motion:reduce){.hl{animation:none}}
+#log[hidden],#mgrp[hidden]{display:none}
+#mgrp{top:calc(var(--hh,110px) + 12px);left:12px;right:12px;bottom:calc(var(--nh,56px) + 12px);max-height:none;border:2px solid var(--brass);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.3);padding:16px 16px 84px}
+#mgrp .mgr{border-left:0;padding-left:0;margin-bottom:0}
+header .mg{flex-direction:column;align-items:flex-end;gap:0;width:auto;margin:0 0 0 auto;padding:6px 10px;font-size:14px}
+.lh{display:flex;justify-content:space-between;align-items:center}.x{border:0;background:none;color:var(--mu);font:inherit;text-decoration:underline}
+.mb{background:var(--slip);border-radius:10px;padding:8px 12px;margin:8px 0}.mb small{display:block;color:var(--mu)}.mb.now{border:1px solid var(--sea)}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){#bub.show{animation:none}}
+#cash{display:inline-block;transform-origin:left}.fl{animation:fu .6s ease-out}.fd{animation:fdn .6s ease-out}
+@keyframes fu{from{color:var(--sea);transform:scale(1.15)}}@keyframes fdn{from{color:var(--rust);transform:scale(.92)}}
+@media(prefers-reduced-motion:reduce){.fl,.fd{animation:none}}
+.asst{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-left:4px solid var(--sea);padding:10px 12px;margin:10px 0;border-radius:3px}
+.asst .av{font-size:28px;line-height:1}
+.asst.cheer{border-left-color:var(--brass);background:var(--slip);animation:pop .4s ease-out}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.asst.cheer{animation:none}}
+.note{background:var(--slip);padding:10px 12px;border-left:4px solid var(--sea);margin-bottom:12px}
+.reset{margin-top:28px;background:none;border:0;color:var(--mu);text-decoration:underline;font:inherit}
+</style></head>
+<body>
+<header><div><small id="day"></small><span class="big" id="cash"></span><small id="stock"></small><small id="net"></small></div><button class="mg" id="mgb" data-a="mgr"></button></header>
+<main id="m"></main>
+<div id="tape"><div class="tk" id="tk"></div></div>
+<nav><button data-s="office"><span>🏢</span>Office</button><button data-s="buy"><span>🛒</span>Buy</button><button data-s="sell"><span>💰</span>Sell</button></nav>
+<div id="log" hidden></div>
+<div id="mgrp" hidden></div>
+<div id="fade"></div>
+<div id="ovl"><i></i></div>
+<div id="intro" hidden><div class="dim"></div><div class="card"><div class="ih"><span class="av2">💁</span><b>Mina</b><button class="x" id="iskip">Skip</button></div><p id="itx"></p><button class="go" id="inext">Next</button></div></div>
+<div id="mina"><div id="bub" data-a="mina"></div><button id="av" data-a="mina" aria-label="Mina, your assistant">💁<i id="dot" hidden></i></button></div>
+<script>
+const C={wheat:{n:'Wheat',e:'🌾',b:20},copper:{n:'Copper',e:'🔩',b:45},coffee:{n:'Coffee',e:'☕',b:90},oil:{n:'Oil',e:'🛢️',b:160},gold:{n:'Gold',e:'🪙',b:400}};
+const NEWS={wheat:['Dry spell worries farmers','Record harvest fills the silos'],copper:['Factory orders surge overseas','Mine strike ends, supply returns'],coffee:['Frost hits the coffee highlands','Bumper crop ships from Brazil'],oil:['Pipeline outage cuts supply','Tankers pile up at the port'],gold:['Markets jittery, buyers want bullion','Calm returns, investors sell gold']};
+const GOOD=['Trade wire','Morning paper','Harbour Times'],BAD=['Anonymous blog','Social media chatter','Unnamed source','Online forum'];
+const UP=[
+{id:'cap',n:'Warehouse',d:'+20 storage space',c:[300,700,1400,2600,4500]},
+{id:'news',n:'Price news report',d:'Tips are right more often',c:[800,2000,4500]},
+{id:'broker',n:'Broker',d:'Lower selling fee',c:[600,1600,3500]},
+{id:'coffee',n:'Unlock coffee',d:'New commodity, bigger prices',c:[900]},
+{id:'oil',n:'Unlock oil',d:'Pricey and volatile',c:[3000]},
+{id:'gold',n:'Unlock gold',d:'The big money',c:[8000]}];
+const WHY={cap:'More storage lets you carry more stock into each trade.',news:'Better tips mean fewer losing trades.',broker:'A lower fee keeps more of every sale.',coffee:'A pricier commodity makes each trade earn more.',oil:'Oil is pricey and swings a lot, so profits can be big.',gold:'Gold is the most valuable commodity in the harbour.'};
+const YAY={cap:()=>`Storage is now ${cap()} units, so you can carry more stock into each trade.`,news:()=>`Tips are now right about ${Math.round(acc()*100)}% of the time.`,broker:()=>`Selling fee is down to ${(fee()*100).toFixed(1)}%, so you keep more of every sale.`,coffee:()=>'Coffee is now on the Buy scene. It costs more per unit, so each trade can earn more.',oil:()=>'Oil is now on sale. Prices are high and swings are big.',gold:()=>'Gold is now on sale, the most valuable commodity in the harbour.'};
+const FEES=[.025,.015,.01,.005],GOAL=20000,UNLOCK=4000,REP=5000;
+let S,confirmReset=false;
+const $=id=>document.getElementById(id);
+const f=n=>'$'+Math.round(n).toLocaleString('en-US');
+const pct=x=>(x>0?'+':'')+Math.round(x*100)+'%';
+const unl=()=>['wheat','copper'].concat(['coffee','oil','gold'].filter(k=>S.lv[k]));
+const cap=()=>40+20*S.lv.cap+15*S.staff.porter;
+const wage=()=>S.staff.scout*40+S.staff.porter*25;
+const units=()=>Object.values(S.inv).reduce((a,b)=>a+b,0);
+const acc=()=>.72+.07*S.lv.news;
+const fee=()=>FEES[S.lv.broker];
+const net=()=>S.cash+Object.keys(C).reduce((a,k)=>a+S.inv[k]*S.p[k],0);
+function save(){try{localStorage.setItem('hl1',JSON.stringify(S))}catch(e){}}
+function fresh(){
+ S={day:1,cash:3000,upOpen:0,scene:'office',msg:'',won:0,p:{},prev:{},mv:{},inv:{},cost:{},tips:[],chat:[{d:1,t:'Welcome to the harbour, boss! I’ve put 10 wheat and 5 copper in storage to get you started. Tap me any time for advice and my past messages.'}],staff:{scout:0,porter:0},lv:{rep:0,cap:0,news:0,broker:0,coffee:0,oil:0,gold:0}};
+ for(const k in C){S.p[k]=S.prev[k]=C[k].b;S.inv[k]=0;S.cost[k]=0}
+ S.inv.wheat=10;S.cost.wheat=200;S.inv.copper=5;S.cost.copper=225;
+ plan();
+}
+function plan(){
+ for(const k in C){
+  const pUp=Math.min(.8,Math.max(.2,.5-(S.p[k]/C[k].b-1)*.35));
+  S.mv[k]=(Math.random()<pUp?1:-1)*(.12+Math.random()*.18);
+ }
+ const N=unl().length,lo=Math.ceil(Math.min(1,.5+.15*S.staff.scout)*N),cnt=lo+Math.floor(Math.random()*(N-lo+1)),ks=unl().sort(()=>Math.random()-.5).slice(0,cnt);
+ S.rtips=mkReport();
+ S.tips=ks.map(k=>{
+  const truth=Math.random()<acc(),up=S.mv[k]>0;
+  const shady=truth?Math.random()<.15:Math.random()<.85,L=shady?BAD:GOOD;
+  return{k,dir:truth?up:!up,sh:shady,src:L[Math.floor(Math.random()*L.length)]};
+ });
+}
+function mkReport(){
+ const u=unl(),lo=Math.ceil(.5*u.length),n=lo+Math.floor(Math.random()*(u.length-lo+1)),ks=u.slice().sort(()=>Math.random()-.5).slice(0,n);
+ return ks.map(k=>{
+  const truth=Math.random()<acc(),up=S.mv[k]>0,shady=truth?Math.random()<.15:Math.random()<.85,L=shady?BAD:GOOD;
+  return{k,dir:truth?up:!up,sh:shady,src:L[Math.floor(Math.random()*L.length)]};
+ });
+}
+function endDay(){
+ const out=[];
+ for(const k of unl()){
+  S.prev[k]=S.p[k];
+  S.p[k]=Math.max(1,Math.round(Math.min(C[k].b*2.5,Math.max(C[k].b*.5,S.p[k]*(1+S.mv[k])))));
+  out.push(C[k].n+' '+pct(S.p[k]/S.prev[k]-1));
+ }
+ for(const k in C)if(!unl().includes(k)){S.prev[k]=S.p[k]}
+ const w=Math.min(S.cash,wage());S.cash-=w;
+ S.day++;S.msg='Day '+S.day+' prices: '+out.join(', ')+'.'+(w?' Wages paid: '+f(w)+'.':'');snd('day');dayAdvice();
+ plan();S.scene='office';
+ if(!S.won&&net()>=GOAL){S.won=1;S.msg='You passed '+f(GOAL)+'! You’re the top trader on the harbour. Keep going for a bigger fortune.'}
+ save();
+}
+function buy(k,n){
+ const room=cap()-units(),can=Math.floor(S.cash/S.p[k]);
+ n=n==='max'?Math.min(room,can):Math.min(n,room,can);
+ if(n<=0)return;
+ S.cash-=n*S.p[k];S.inv[k]+=n;S.cost[k]+=n*S.p[k];snd('buy');
+}
+function sell(k,n){
+ n=n==='all'?S.inv[k]:Math.min(n,S.inv[k]);
+ if(n<=0)return;
+ const avg=S.cost[k]/S.inv[k];
+ S.cash+=n*S.p[k]*(1-fee());S.inv[k]-=n;S.cost[k]-=avg*n;snd('sell');checkMilestone();
+ if(S.inv[k]===0)S.cost[k]=0;
+}
+function upgrade(id){
+ const u=UP.find(x=>x.id===id),l=S.lv[id];
+ if(!S.upOpen||l>=u.c.length||S.cash<u.c[l])return;
+ S.cash-=u.c[l];S.lv[id]++;
+ say('Congratulations, boss! '+(u.c.length>1?u.n+' is now level '+S.lv[id]+'. ':u.n+' complete. ')+YAY[id]());snd('up');
+}
+let AC,lastCash;
+function tone(fr,t0,d,ty,v){const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;o.type=ty;o.frequency.value=fr;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d)}
+function snd(k){
+ if(S.mute)return;
+ try{
+  AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume();
+  const P={buy:[[440,0,.1],[587,.07,.12]],sell:[[784,0,.08],[1047,.08,.16]],up:[[523,0,.15],[659,.1,.15],[784,.2,.15],[1047,.3,.4]],hire:[[392,0,.12],[523,.1,.12],[659,.2,.3]],day:[[330,0,.25],[262,.18,.4]],fire:[[262,0,.15],[196,.12,.3]]};
+  (P[k]||[]).forEach(n=>tone(n[0],n[1],n[2],k==='up'?'triangle':'sine',.15));
+ }catch(e){}
+}
+const HIRE={scout:{n:'Scout',e:'🕵️',fee:500,w:40,max:3,d:'Widens news coverage, so more commodities get tips.'},porter:{n:'Porter',e:'📦',fee:300,w:25,max:4,d:'Adds 15 storage space.'}};
+function hire(k){
+ const h=HIRE[k];
+ if(S.staff[k]>=h.max||S.cash<h.fee)return;
+ S.cash-=h.fee;S.staff[k]++;
+ say('Welcome aboard! Your new '+h.n.toLowerCase()+' starts now. '+h.d+' Daily wages are now '+f(wage())+'.');
+ snd('hire');
+}
+let bubT,logOpen=false;
+function showBub(t){
+ const b=$('bub');b.innerHTML=t;b.classList.add('show');
+ clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('show'),7000);
+}
+function say(t,log){
+ if(log!==false){S.chat.push({d:S.day,t});if(S.chat.length>30)S.chat.shift();S.unread=!logOpen}
+ showBub(t);
+}
+function advice(){
+ if(!S.lv.rep)return 'Unlock the Price news report in the Office for '+f(REP)+' to get extra daily tips on top of the ticker tape.';
+ if(!S.upOpen)return 'Upgrades unlock once we hold '+f(UNLOCK)+' in cash. We have '+f(S.cash)+', so '+f(Math.max(0,UNLOCK-S.cash))+' to go. Buy low and sell high to get there.';
+ const s=suggest();let t='';
+ if(s){const need=s.c-S.cash;t=need<=0?`You can afford <b>${s.u.n}</b> (${f(s.c)}) right now. ${WHY[s.u.id]}`:`Next up: <b>${s.u.n}</b> for ${f(s.c)}. ${WHY[s.u.id]} You need ${f(need)} more.`}
+ if(!S.staff.scout&&!S.staff.porter&&S.cash>=300&&S.day>=3)t+=' Tap my chat to hire staff.';
+ if(wage()>0&&S.cash<wage()*2)t+=` Careful, boss: cash is low and tonight’s wages are ${f(wage())}.`;
+ return t||'You’ve bought everything. Go make a fortune, boss!';
+}
+function dayAdvice(){
+ if(S.lastAdv!==undefined&&S.day-S.lastAdv<4)return;
+ S.lastAdv=S.day;
+ if(!S.upOpen){say(advice());return}
+ const s=suggest(),key=s?s.u.id+S.lv[s.u.id]:'done',fresh2=S.lastSug!==key;
+ S.lastSug=key;say(advice(),fresh2);
+}
+const INTRO=[
+ {scene:'office',sel:'#cash',t:()=>'Welcome, boss! I’m Mina, your assistant. I’ve registered Harbour Ledger Trading Co. and opened the company account with '+f(S.cash)+'.'},
+ {scene:'office',sel:'#net',t:()=>'We trade commodities like wheat and copper, and the idea is simple: buy low, sell high, and keep the difference as profit.'},
+ {scene:'sell',sel:'#stock,#m .row',t:()=>'We already own some assets we need to manage: '+S.inv.wheat+' wheat and '+S.inv.copper+' copper in storage. Sell them when the price looks right, or hold on and wait.'},
+ {scene:'office',sel:'#m h2,#rep,.slip',top:1,t:()=>'Prices change every night. The ticker tape below shows tips for free, and the Price news report adds more. Check the sources, and upgrade it for better accuracy.'},
+ {scene:'office',sel:'#upg-h,.upg',t:()=>'Upgrades are locked until we hold '+f(UNLOCK)+' in cash. Then we can buy more storage, better tips, lower fees and new goods. I’ll remind you of our progress.'},
+ {scene:'sell',sel:'#m .go',t:()=>'When you’re done trading, tap End day to move on to the next morning.'},
+ {scene:'office',sel:'#av',t:()=>'That’s everything for now, boss. Congratulations on opening the company, and I wish you every success! I’m always available through this chat bubble whenever you need advice or want to hire staff.'}
+];
+let iTimer,iStep=0,iDone=false,iText='';
+function clearHl(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'))}
+let iCued=false;
+function applyCue(st){iCued=true;clearHl();const e=document.querySelectorAll(st.cue[1]);e.forEach(x=>x.classList.add('hl'));if(e[0])e[0].scrollIntoView({block:'start'})}
+function finishType(){if(INTRO[iStep].cue&&!iCued)applyCue(INTRO[iStep]);clearInterval(iTimer);iDone=true;$('itx').textContent=iText;$('inext').textContent=iStep===INTRO.length-1?'Start trading':'Next'}
+function introStep(i){
+ iStep=i;const st=INTRO[i];
+ clearHl();
+ S.scene=st.scene;mgrOpen=false;logOpen=false;render();
+ const els=document.querySelectorAll(st.sel);
+ els.forEach(e=>e.classList.add('hl'));
+ if(st.top)$('m').scrollTop=0;else if(els[0]&&els[0].closest('#m'))els[0].scrollIntoView({block:'start'});
+ iText=st.t();iDone=false;iCued=false;clearInterval(iTimer);
+ $('itx').textContent='';$('inext').textContent='Next';
+ let n=0;
+ iTimer=setInterval(()=>{n++;$('itx').textContent=iText.slice(0,n);if(st.cue&&!iCued&&n>=iText.indexOf(st.cue[0])+st.cue[0].length)applyCue(st);if(n>=iText.length)finishType()},28);
+}
+function clearNudge(){document.querySelectorAll('nav .nudge').forEach(b=>b.classList.remove('nudge'))}
+function nudgeNav(){clearNudge();document.querySelectorAll('nav button[data-s="buy"],nav button[data-s="sell"]').forEach(b=>b.classList.add('nudge'));setTimeout(clearNudge,12000)}
+function startIntro(){$('intro').hidden=false;introStep(0)}
+function endIntro(){
+ clearInterval(iTimer);clearHl();$('intro').hidden=true;
+ S.seen=1;S.scene='office';save();render();$('m').scrollTop=0;nudgeNav();
+}
+$('inext').onclick=()=>{if(!iDone)finishType();else if(iStep>=INTRO.length-1)endIntro();else introStep(iStep+1)};
+$('itx').onclick=()=>{if(!iDone)finishType()};
+$('iskip').onclick=endIntro;
+function scrollCue(){
+ const m=$('m'),more=m.scrollHeight-m.scrollTop-m.clientHeight>8;
+ $('fade').classList.toggle('on',more&&S.scene==='office');
+ const e=document.querySelector('.endm');if(e)e.classList.toggle('hit',!more);
+}
+$('m').addEventListener('scroll',scrollCue);
+let ovT,tBase=null;
+const atEnd=()=>{const m=$('m');return m.scrollHeight-m.scrollTop-m.clientHeight<=2};
+function ovShow(px){
+ const l=$('ovl'),i=l.firstChild;
+ l.classList.add('on');i.style.width=Math.min(100,px/120*100)+'%';
+ clearTimeout(ovT);
+ ovT=setTimeout(()=>{ovW=0;l.classList.remove('on');setTimeout(()=>{if(!l.classList.contains('on'))i.style.width='0'},500)},250);
+}
+let ovW=0;
+$('m').addEventListener('wheel',e=>{
+ if(S.scene!=='office'||!atEnd()||e.deltaY<=0){ovW=0;return}
+ ovW+=e.deltaY;ovShow(ovW);clearTimeout(ovW.t);
+},{passive:true});
+$('m').addEventListener('touchstart',e=>{tBase=e.touches[0].clientY},{passive:true});
+$('m').addEventListener('touchmove',e=>{
+ const y=e.touches[0].clientY;
+ if(S.scene!=='office'||!atEnd()){tBase=y;return}
+ if(tBase===null)tBase=y;
+ const d=tBase-y;if(d>0)ovShow(d);
+},{passive:true});
+$('m').addEventListener('touchend',()=>{tBase=null});
+let mgrOpen=false;
+const NAMES={scout:['Ivy','Ravi','Tomas'],porter:['Bo','Dara','Kofi','Lena']};
+function fire(k){
+ if(!S.staff[k]||(k==='porter'&&units()>cap()-15))return;
+ const nm=NAMES[k][S.staff[k]-1];S.staff[k]--;
+ say('Understood, boss. '+nm+' the '+k+' has been let go. Daily wages are now '+f(wage())+'.');snd('fire');
+}
+function mgrBlock(){
+ let h='<div class="mgr"><p class="mu" style="margin-top:0">Wages come out of your cash every night. Hiring has a one-time fee, and firing is free.</p>';
+ h+=Object.keys(HIRE).map(k=>{
+  const x=HIRE[k],n=S.staff[k],lock=k==='porter'&&units()>cap()-15;
+  return`<div class="row" style="flex-wrap:wrap"><span class="i">${x.e}</span><div class="t"><b>${x.n}s (${n}/${x.max})</b><div class="mu" style="margin:0">${n?NAMES[k].slice(0,n).join(', ')+'. ':'Nobody hired. '}${f(n*x.w)} a day.${lock?' Sell some stock first, the porters are carrying it.':''}</div></div><div class="btns" style="width:100%"><button class="b" data-a="hire" data-k="${k}"${n>=x.max||S.cash<x.fee?' disabled':''}>Hire ${f(x.fee)}</button><button class="b" data-a="fire" data-k="${k}"${n&&!lock?'':' disabled'}>Fire</button></div></div>`;
+ }).join('');
+ return h+`<div class="row"><div class="t"><b>Total payroll</b></div><b>${f(wage())} a day</b></div></div>`;
+}
+function hireBlock(){
+ return '<div class="mb now"><small>Hiring</small>I can hire help for you, boss. Wages come out each night: '+f(wage())+' a day right now.</div>'+Object.keys(HIRE).map(k=>{const x=HIRE[k],n=S.staff[k];return`<div class="row"><span class="i">${x.e}</span><div class="t"><b>${x.n} (${n}/${x.max})</b><div class="mu" style="margin:0">${x.d} Wage ${f(x.w)} a day.</div></div>${n>=x.max?'<span class="mu">Full</span>':`<button class="b" data-a="hire" data-k="${k}"${S.cash<x.fee?' disabled':''}>Hire ${f(x.fee)}</button>`}</div>`}).join('');
+}
+function renderMina(){
+ $('dot').hidden=!S.unread||logOpen;
+ $('mgb').innerHTML='<span>'+(mgrOpen?'Close staff panel':'Manage staff')+'</span><span>'+(S.staff.scout+S.staff.porter)+' hired, '+f(wage())+'/day</span>';
+ document.documentElement.style.setProperty('--hh',Math.round(document.querySelector('header').getBoundingClientRect().bottom)+'px');
+ document.documentElement.style.setProperty('--nh',Math.round(window.innerHeight-$('tape').getBoundingClientRect().top)+'px');
+ const mp=$('mgrp');mp.hidden=!mgrOpen;if(mgrOpen)mp.innerHTML='<div class="lh"><b>Payroll</b><button class="x" data-a="mgr">Close</button></div>'+mgrBlock();
+ const lg=$('log');lg.hidden=!logOpen;
+ if(logOpen){
+  lg.innerHTML='<div class="lh"><b>Mina</b><button class="x" data-a="mina">Close</button></div>'+S.chat.map(c=>`<div class="mb"><small>Day ${c.d}</small>${c.t}</div>`).join('')+`<div class="mb now"><small>Advice now</small>${advice()}</div>`+hireBlock();
+  lg.scrollTop=lg.scrollHeight;
+ }
+}
+function checkMilestone(){
+ if(S.upOpen||S.cash<UNLOCK)return;
+ S.upOpen=1;S.lastAdv=-99;save();
+ setTimeout(()=>{
+  say('Great news, boss! We’ve reached '+f(UNLOCK)+' in cash, so upgrades are now unlocked. Let me show you.');
+  snd('up');S.scene='office';mgrOpen=false;logOpen=false;render();
+  const els=document.querySelectorAll('#upg-h,.upg');els.forEach(e=>e.classList.add('fl2'));
+  if(els[0])els[0].scrollIntoView({block:'start',behavior:'smooth'});
+  setTimeout(()=>document.querySelectorAll('.fl2').forEach(e=>e.classList.remove('fl2')),5000);
+ },900);
+}
+function suggest(){
+ let best=null;
+ for(const u of UP){const l=S.lv[u.id];if(l>=u.c.length)continue;if(!best||u.c[l]<best.c)best={u,c:u.c[l]}}
+ return best;
+}
+function assistant(){
+ let h='';
+ if(S.cheer)h+=`<div class="asst cheer"><span class="av">💁</span><div><b>Mina</b><br>${S.cheer}</div></div>`;
+ const s=suggest();
+ if(s){const need=s.c-S.cash;h+=`<div class="asst"><span class="av">💁</span><div><b>Mina</b><br>${need<=0?`You can afford <b>${s.u.n}</b> (${f(s.c)}) right now. ${WHY[s.u.id]}`:`Next up: <b>${s.u.n}</b> for ${f(s.c)}. ${WHY[s.u.id]} You need ${f(need)} more.`}</div></div>`}
+ if(wage()>0&&S.cash<wage()*2)h+=`<div class="asst"><span class="av">💁</span><div><b>Mina</b><br>Careful, boss: cash is low and tonight’s wages are ${f(wage())}.</div></div>`;
+ return h;
+}
+let lastTape='';
+function renderTape(){
+ let html;
+ html=S.tips.map(t=>`<span class="ti${t.sh?' bad':''}">${C[t.k].e}<b class="ar ${t.dir?'up':'dn'}">${t.dir?'▲':'▼'}</b>${NEWS[t.k][t.dir?0:1]}<i>${t.sh?'Unconfirmed: ':''}${t.src}</i></span>`).join('');
+ if(html===lastTape)return;lastTape=html;
+ const tk=$('tk');
+ tk.innerHTML=('<span class="cp">'+html+'</span>').repeat(3);
+ tk.style.animationDuration=Math.max(20,html.replace(/<[^>]+>/g,'').length*.22)+'s';
+}
+function repHead(){
+ let h='<h3 id="rep" style="margin-top:6px">Price news report'+(S.lv.rep?' (level '+(S.lv.news+1)+')':'')+'</h3>';
+ if(!S.lv.rep)h+=`<div class="slip lock"><b>🔒 Extra daily tips</b><small>Unlock extra daily tips on where prices are heading. The ticker tape below already shows some tips for free.</small><small class="need">${S.cash<REP?'You need '+f(REP-S.cash)+' more to unlock it.':'You can afford it now.'}</small><button class="go" data-a="rep"${S.cash<REP?' disabled':''}>Unlock for ${f(REP)}</button></div>`;
+ return h;
+}
+function office(){
+ let h='<h2>Office</h2><p class="mu">Check the price news report, then trade and end the day. Slips from unreliable sources are usually wrong, but not always.</p>';
+ if(S.msg)h+=`<div class="note">${S.msg}</div>`;
+ h+=repHead();
+ if(S.lv.rep)h+=(S.rtips||[]).length?S.rtips.map(t=>`<div class="slip${t.sh?' bad':''}"><div><b>${C[t.k].e} ${NEWS[t.k][t.dir?0:1]}</b><small>${t.sh?'Unconfirmed: ':''}${t.src}</small></div><span class="ar ${t.dir?'up':'dn'}">${t.dir?'▲':'▼'}</span></div>`).join(''):'<p class="mu">No slips today.</p>';
+ h+='<h3>Holdings</h3>';
+ const have=unl().filter(k=>S.inv[k]>0);
+ h+=have.length?have.map(k=>{const tot=(S.p[k]*(1-fee())-S.cost[k]/S.inv[k])*S.inv[k];return`<div class="row hold" data-s="sell"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b> × ${S.inv[k]}<div class="mu" style="margin:0">Worth ${f(S.inv[k]*S.p[k])}</div></div><span class="${tot>=0?'up':'dn'}">${tot>=0?'+':'−'}${f(Math.abs(tot))}</span></div>`}).join(''):'<p class="mu">Storage is empty. Visit the Buy scene.</p>';
+ h+='<h3 id="upg-h">Upgrades</h3><p class="mu" style="margin-top:0">'+(S.upOpen?'Tip accuracy and fees improve as you invest.':'🔒 Locked until you hold '+f(UNLOCK)+' in cash. You have '+f(S.cash)+' so far.')+'</p>';
+ h+=UP.map(u=>{
+  const l=S.lv[u.id],done=l>=u.c.length;
+  return`<div class="row upg" data-u="${u.id}"><div class="t"><b>${u.n}${u.c.length>1?' (level '+l+')':''}</b><div class="mu" style="margin:0">${u.d}</div></div>${done?'<span class="mu">Owned</span>':`<button class="b" data-a="up" data-k="${u.id}" ${!S.upOpen||S.cash<u.c[l]?'disabled':''}>${S.upOpen?'':'🔒 '}${f(u.c[l])}</button>`}</div>`;
+ }).join('');
+  h+='<div class="dbg"><small>Debug tools: add money</small><button class="b" data-a="dbg" data-n="1000">+$1,000</button><button class="b" data-a="dbg" data-n="5000">+$5,000</button><button class="b" data-a="dbg" data-n="50000">+$50,000</button></div>';
+ h+='<button class="reset" data-a="mute">Sound: '+(S.mute?'off':'on')+'</button> ';
+ h+='<button class="reset" data-a="reset">'+(confirmReset?'Tap again to erase your progress':'Start a new game')+'</button>';
+ return h;
+}
+function buyScene(){
+ let h='<h2>Buy</h2><p class="mu">Today’s prices. Storage: '+units()+' / '+cap()+'.</p>';
+ h+=unl().map(k=>{
+  const ch=S.p[k]/S.prev[k]-1;
+  return`<div class="row"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b><div>${f(S.p[k])} <span class="${ch>=0?'up':'dn'}">${pct(ch)}</span></div><div class="mu" style="margin:0">Own ${S.inv[k]}${S.inv[k]?(()=>{const t=(S.p[k]*(1-fee())-S.cost[k]/S.inv[k])*S.inv[k];return`, <span class="${t>=0?'up':'dn'}">${t>=0?'profit':'loss'} ${f(Math.abs(t))}</span>`})():''}</div></div><div class="btns"><button class="b" data-a="buy" data-k="${k}" data-n="1">+1</button><button class="b" data-a="buy" data-k="${k}" data-n="10">+10</button><button class="b" data-a="buy" data-k="${k}" data-n="max">Max</button></div></div>`;
+ }).join('');
+ h+='<button class="go" data-a="end">End day</button>';
+ return h;
+}
+function sellScene(){
+ let h='<h2>Sell</h2>';
+ if(S.msg)h+=`<div class="note">${S.msg}</div>`;
+ h+='<p class="mu">Storage '+units()+' / '+cap()+'. Selling fee: '+(fee()*100).toFixed(1)+'%.</p>';
+ const have=unl().filter(k=>S.inv[k]>0);
+ if(!have.length)h+='<p class="mu">Nothing to sell. Buy something first, then end the day in the office.</p>';
+ h+=have.map(k=>{
+  const pl=S.p[k]*(1-fee())-S.cost[k]/S.inv[k],tot=pl*S.inv[k];
+  return`<div class="row"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b> × ${S.inv[k]}<div>${f(S.p[k])} each</div><div class="${tot>=0?'up':'dn'}">${tot>=0?'Profit':'Loss'} ${f(Math.abs(tot))}</div></div><div class="btns"><button class="b" data-a="sell" data-k="${k}" data-n="1">−1</button><button class="b" data-a="sell" data-k="${k}" data-n="10">−10</button><button class="b" data-a="sell" data-k="${k}" data-n="all">All</button></div></div>`;
+ }).join('');
+ h+='<button class="go" data-a="end">End day</button>';
+ return h;
+}
+function render(){
+ if(S.scene==='market')S.scene='buy';
+ $('day').textContent='Day '+S.day;
+ const el=$('cash'),old=lastCash;el.textContent=f(S.cash);
+ if(old!==undefined&&old!==S.cash){el.classList.remove('fl','fd');void el.offsetWidth;el.classList.add(S.cash>old?'fl':'fd')}
+ lastCash=S.cash;renderMina();renderTape();
+ $('stock').textContent='Stock '+units()+' / '+cap();
+ $('net').textContent='Net worth '+f(net())+' of '+f(GOAL);
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.scene));
+ if(S.scene!=='office')clearNudge();
+ const y=$('m').scrollTop;
+ $('m').innerHTML=S.scene==='office'?office():S.scene==='buy'?buyScene():sellScene();
+ $('m').scrollTop=y;scrollCue();
+ if(S.day===1&&S.seen&&S.scene!=='office'){
+  if(!S.endHint){S.endHint=1;save();setTimeout(()=>say('When you’re done trading, tap End day to move on to the next morning.'),1200)}
+  document.querySelectorAll('#m .go').forEach(b=>b.classList.add('fl2'));
+ }
+}
+document.addEventListener('click',e=>{
+ const s=e.target.closest('[data-s]');
+ if(s){confirmReset=false;S.cheer='';S.scene=s.dataset.s;$('m').scrollTop=0;render();return}
+ const b=e.target.closest('[data-a]');
+ if(!b)return;
+ const a=b.dataset.a,k=b.dataset.k,n=isNaN(b.dataset.n)?b.dataset.n:+b.dataset.n;
+ if(a!=='reset')confirmReset=false;
+ if(a==='buy')buy(k,n);
+ else if(a==='sell')sell(k,n);
+ else if(a==='up')upgrade(k);
+ else if(a==='hire')hire(k);
+ else if(a==='fire')fire(k);
+ else if(a==='rep'){if(!S.lv.rep&&S.cash>=REP){S.cash-=REP;S.lv.rep=1;say('Price news report unlocked, boss! You now get extra tips here every day. Check the sources, because some are unreliable.');snd('up')}}
+ else if(a==='mgr'){mgrOpen=!mgrOpen;if(mgrOpen)logOpen=false}
+ else if(a==='mina'){logOpen=!logOpen;S.unread=false;if(logOpen){$('bub').classList.remove('show');mgrOpen=false}}
+ else if(a==='mute'){S.mute=!S.mute;snd('buy')}
+ else if(a==='dbg'){S.cash+=n;snd('sell');checkMilestone()}
+ else if(a==='end'){endDay();$('m').scrollTop=0}
+ else if(a==='reset'){if(!confirmReset){confirmReset=true;render();return}confirmReset=false;fresh();setTimeout(startIntro,50)}
+ save();render();
+});
+try{const r=localStorage.getItem('hl1');if(r)S=JSON.parse(r)}catch(e){}
+if(!S||!S.lv)fresh();
+if(!S.staff)S.staff={scout:0,porter:0};
+if(!S.chat)S.chat=[];
+if(S.lv.rep===undefined)S.lv.rep=1;
+if(S.upOpen===undefined)S.upOpen=(S.day>1||Object.values(S.lv).some(x=>x>0))?1:0;
+render();
+if(S.day===1&&!S.seen)startIntro();
+</script></body></html>
