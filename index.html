@@ -41,6 +41,17 @@ nav button span{font-size:22px;line-height:1}
 nav button:active{transform:translateY(3px);box-shadow:0 0 0 var(--brass)}
 nav button.on{background:var(--brass);color:var(--bg);box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .hold{cursor:pointer}.hold:active{opacity:.6}
+.bx{position:absolute;top:-12px;right:-8px;width:28px;height:28px;border-radius:50%;border:2px solid var(--brass);background:var(--card);color:var(--ink);font:700 18px/1 "DM Sans",sans-serif;padding:0}
+.hr{display:flex;align-items:center;gap:10px}
+.chev{font-size:26px;line-height:1;color:var(--mu);font-weight:400}
+.drh{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;background:none;border:0;padding:2px 0;color:var(--ink);font:inherit;text-align:left}
+.drh b{font-family:Fraunces,Georgia,serif;font-size:17px}
+.hc{font-weight:700;white-space:nowrap;display:inline-block}
+.flashv{animation:vflash 1s ease-in-out 2;padding:2px 8px;border-radius:10px}
+@keyframes vflash{50%{background:rgba(224,176,74,.5)}}
+@media(prefers-reduced-motion:reduce){.flashv{animation:none;background:rgba(224,176,74,.35)}}
+#intro .card.top{top:var(--hh,100px);bottom:auto;border-top:0;border-bottom:3px solid var(--brass);padding:14px 16px}
+#av.hl{pointer-events:none}
 .slip.debt{border-color:var(--rust)}.slip.debt b{color:var(--rust)}
 .dr{background:var(--card);border-left:4px solid var(--brass);padding:10px 12px;margin:14px 0;border-radius:3px}
 .dr>b:first-child{display:block;font-family:Fraunces,Georgia,serif;font-size:17px;margin-bottom:4px}
@@ -86,7 +97,7 @@ main{padding-bottom:90px}
 #intro .dim{position:fixed;inset:0;z-index:60;background:rgba(10,18,32,.74)}
 #intro .card{position:fixed;z-index:62;left:0;right:0;bottom:0;background:var(--card);border-top:3px solid var(--brass);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px))}
 .ih{display:flex;align-items:center;gap:8px}.ih .x{margin-left:auto}.av2{font-size:30px;line-height:1}
-#itx{min-height:100px;margin:8px 0;font-size:17px}
+#itx{min-height:72px;margin:8px 0;font-size:17px}
 .hl{position:relative;z-index:61;background:var(--bg);box-shadow:0 0 0 6px var(--bg);outline:3px solid var(--brass);outline-offset:6px;border-radius:4px;animation:flash .9s ease-in-out infinite}
 @keyframes flash{50%{outline-color:transparent}}
 @media(prefers-reduced-motion:reduce){.hl{animation:none}}
@@ -125,21 +136,23 @@ const C={wheat:{n:'Wheat',e:'🌾',b:20},copper:{n:'Copper',e:'🔩',b:45},coffe
 const NEWS={wheat:['Dry spell worries farmers','Record harvest fills the silos'],copper:['Factory orders surge overseas','Mine strike ends, supply returns'],coffee:['Frost hits the coffee highlands','Bumper crop ships from Brazil'],oil:['Pipeline outage cuts supply','Tankers pile up at the port'],gold:['Markets jittery, buyers want bullion','Calm returns, investors sell gold']};
 const GOOD=['Trade wire','Morning paper','Harbour Times'],BAD=['Anonymous blog','Social media chatter','Unnamed source','Online forum'];
 const UP=[
-{id:'cap',n:'Warehouse',d:'+20 storage space',c:[300,700,1400,2600,4500]},
+{id:'cap',n:'Warehouse',d:'+20 storage space',c:[300,700,1400,2600,4500,40000,120000]},
 {id:'news',n:'Price news report',d:'Tips are right more often',c:[800,2000,4500]},
 {id:'broker',n:'Broker',d:'Lower selling fee',c:[600,1600,3500]},
 {id:'coffee',n:'Unlock coffee',d:'New commodity, bigger prices',c:[900]},
 {id:'oil',n:'Unlock oil',d:'Pricey and volatile',c:[3000]},
-{id:'gold',n:'Unlock gold',d:'The big money',c:[8000]}];
-const WHY={cap:'More storage lets you carry more stock into each trade.',news:'Better tips mean fewer losing trades.',broker:'A lower fee keeps more of every sale.',coffee:'A pricier commodity makes each trade earn more.',oil:'Oil is pricey and swings a lot, so profits can be big.',gold:'Gold is the most valuable commodity in the harbour.'};
-const YAY={cap:()=>`Storage is now ${cap()} units, so you can carry more stock into each trade.`,news:()=>`Tips are now right about ${Math.round(acc()*100)}% of the time.`,broker:()=>`Selling fee is down to ${(fee()*100).toFixed(1)}%, so you keep more of every sale.`,coffee:()=>'Coffee is now on the Buy scene. It costs more per unit, so each trade can earn more.',oil:()=>'Oil is now on sale. Prices are high and swings are big.',gold:()=>'Gold is now on sale, the most valuable commodity in the harbour.'};
-const FEES=[.025,.015,.01,.005],GOAL=20000,UNLOCK=4000,REP=5000,RATE=.05;
+{id:'gold',n:'Unlock gold',d:'The big money',c:[8000]},
+{id:'off',n:'New office space',d:'+2 warehouse upgrades, double porter limit',c:[250000]}];
+const WHY={cap:'More storage lets you carry more stock into each trade.',news:'Better tips mean fewer losing trades.',broker:'A lower fee keeps more of every sale.',coffee:'A pricier commodity makes each trade earn more.',oil:'Oil is pricey and swings a lot, so profits can be big.',gold:'Gold is the most valuable commodity in the harbour.',off:'A bigger office unlocks two more warehouse upgrades and lets us hire twice as many porters.'};
+const YAY={cap:()=>`Storage is now ${cap()} units, so you can carry more stock into each trade.`,news:()=>`Tips are now right about ${Math.round(acc()*100)}% of the time.`,broker:()=>`Selling fee is down to ${(fee()*100).toFixed(1)}%, so you keep more of every sale.`,coffee:()=>'Coffee is now on the Buy scene. It costs more per unit, so each trade can earn more.',oil:()=>'Oil is now on sale. Prices are high and swings are big.',gold:()=>'Gold is now on sale, the most valuable commodity in the harbour.',off:()=>'Our new office is open! Two more warehouse upgrades are unlocked, and we can now hire up to 8 porters.'};
+const FEES=[.025,.015,.01,.005],GOAL=Infinity,UNLOCK=4000,REP=5000,RATE=.05,TAXR=.06,MS=[20000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000,50000000];
 let S,confirmReset=false;
 const $=id=>document.getElementById(id);
 const f=n=>'$'+Math.round(n).toLocaleString('en-US');
 const pct=x=>(x>0?'+':'')+Math.round(x*100)+'%';
 const unl=()=>['wheat','copper'].concat(['coffee','oil','gold'].filter(k=>S.lv[k]));
 const cap=()=>40+20*S.lv.cap+15*S.staff.porter;
+const mx=u=>u.id==='cap'&&!S.lv.off?5:u.c.length;
 const wage=()=>S.staff.scout*40+S.staff.porter*25;
 const units=()=>Object.values(S.inv).reduce((a,b)=>a+b,0);
 const acc=()=>.72+.07*S.lv.news;
@@ -147,7 +160,7 @@ const fee=()=>FEES[S.lv.broker];
 const net=()=>S.cash+Object.keys(C).reduce((a,k)=>a+S.inv[k]*S.p[k],0)-(S.debt||0);
 function save(){try{localStorage.setItem('hl1',JSON.stringify(S))}catch(e){}}
 function fresh(){
- S={day:1,cash:3000,upOpen:0,debt:0,scene:'office',msg:'',won:0,p:{},prev:{},mv:{},inv:{},cost:{},tips:[],chat:[{d:1,t:'Welcome to the harbour, boss! I’ve put 10 wheat and 5 copper in storage to get you started. Tap me any time for advice and my past messages.'}],staff:{scout:0,porter:0},lv:{rep:0,cap:0,news:0,broker:0,coffee:0,oil:0,gold:0}};
+ S={day:1,cash:3000,upOpen:0,debt:0,ms:0,scene:'office',msg:'',won:0,p:{},prev:{},mv:{},inv:{},cost:{},tips:[],chat:[{d:1,t:'Welcome to the harbour, boss! I’ve put 10 wheat and 5 copper in storage to get you started. Tap me any time for advice and my past messages.'}],staff:{scout:0,porter:0},lv:{rep:0,off:0,cap:0,news:0,broker:0,coffee:0,oil:0,gold:0}};
  for(const k in C){S.p[k]=S.prev[k]=C[k].b;S.inv[k]=0;S.cost[k]=0}
  S.inv.wheat=10;S.cost.wheat=200;S.inv.copper=5;S.cost.copper=225;
  plan();
@@ -182,8 +195,14 @@ function endDay(){
  for(const k in C)if(!unl().includes(k)){S.prev[k]=S.p[k]}
  const ii=Math.round(S.debt*RATE);S.debt+=ii;
  const w=Math.min(S.cash,wage()),sf=wage()-w;S.cash-=w;S.debt+=sf;
+ const nd=S.day+1,est=Math.max(300,Math.round(net()*TAXR));let tx=0,txs=0;
+ if(nd%120===0){tx=Math.min(S.cash,est);txs=est-tx;S.cash-=tx;S.debt+=txs;S.lastAdv=nd;say('The quarterly harbour dues are due today, boss: '+f(est)+(txs>0?'. We couldn’t cover all of it, so '+f(txs)+' went on credit, and that debt grows with interest.':', paid from our cash.')+' They come around every 120 days.')}
+ else if(nd%120===90){S.lastAdv=nd;say('Heads up, boss: the harbour authority collects its quarterly dues in 30 days. At our current net worth that’s about '+f(est)+'. Better keep some cash aside.')}
+ else if(nd%120===113){S.lastAdv=nd;say('Reminder: the harbour dues are due in 7 days, around '+f(est)+'. Make sure we have the cash, or it goes on credit with interest.')}
  if(sf>0){S.lastAdv=S.day+1;say(S.debtSeen?'We couldn’t cover the wages again, boss, so another '+f(sf)+' went on credit. We now owe '+f(S.debt)+'.':'Boss, we couldn’t cover tonight’s wages, so I put the missing '+f(sf)+' on credit. Debt grows '+Math.round(RATE*100)+'% every day, and the interest compounds, so sell some stock and repay it from the Office soon.');S.debtSeen=1}
- S.rep={day:S.day+1,w,sf,i:ii,debt:S.debt,rows:unl().filter(k=>S.inv[k]>0).map(k=>({k,q:S.inv[k],a:S.prev[k],b:S.p[k]}))};
+ if(S.ms>=2&&!S.lv.off){if(!S.offFrom)S.offFrom=nd;if(nd-S.offFrom>=30&&nd%120!==0&&nd%120!==90&&nd%120!==113){S.offFrom=nd;S.lastAdv=nd;say(offNudge())}}
+ if(nd>=45&&!S.duesSeen){S.duesSeen=1;S.lastAdv=nd;say('Boss, I’ve added the harbour dues to your morning report. Every 120 days the harbour authority charges us '+Math.round(TAXR*100)+'% of our net worth. The report now shows when the next payment is due and roughly how much it will be.')}
+ S.repOpen=true;repT0=Date.now();clearTimeout(repT);repT=setTimeout(()=>{if(!S.tutOn&&S.rep&&S.rep.day===S.day){S.repOpen=false;save();render()}},6000);S.rep={day:S.day+1,w,sf,i:ii,tx,txs,debt:S.debt,rows:unl().filter(k=>S.inv[k]>0).map(k=>({k,q:S.inv[k],a:S.prev[k],b:S.p[k]}))};
  S.day++;S.msg='Day '+S.day+' prices: '+out.join(', ')+'.'+(w?' Wages paid: '+f(w)+'.':'');snd('day');dayAdvice();
  plan();S.scene='office';
  if(!S.won&&net()>=GOAL){S.won=1;S.msg='You passed '+f(GOAL)+'! You’re the top trader on the harbour. Keep going for a bigger fortune.'}
@@ -204,7 +223,7 @@ function sell(k,n){
 }
 function upgrade(id){
  const u=UP.find(x=>x.id===id),l=S.lv[id];
- if(!S.upOpen||l>=u.c.length||S.cash<u.c[l])return;
+ if(!S.upOpen||l>=mx(u)||S.cash<u.c[l])return;
  S.cash-=u.c[l];S.lv[id]++;
  say('Congratulations, boss! '+(u.c.length>1?u.n+' is now level '+S.lv[id]+'. ':u.n+' complete. ')+YAY[id]());snd('up');
 }
@@ -219,7 +238,7 @@ function snd(k){
   (P[k]||[]).forEach(n=>tone(n[0],n[1],n[2],k==='up'?'triangle':'sine',.15));
  }catch(e){}
 }
-const HIRE={scout:{n:'Scout',e:'🕵️',fee:500,w:40,max:3,d:'Widens news coverage, so more commodities get tips.'},porter:{n:'Porter',e:'📦',fee:300,w:25,max:4,d:'Adds 15 storage space.'}};
+const HIRE={scout:{n:'Scout',e:'🕵️',fee:500,w:40,max:3,d:'Widens news coverage, so more commodities get tips.'},porter:{n:'Porter',e:'📦',fee:300,w:25,get max(){return S&&S.lv&&S.lv.off?8:4},d:'Adds 15 storage space.'}};
 function hire(k){
  const h=HIRE[k];
  if(S.staff[k]>=h.max||S.cash<h.fee)return;
@@ -229,16 +248,28 @@ function hire(k){
 }
 let bubT,logOpen=false;
 function showBub(t){
- const b=$('bub');b.innerHTML=t;b.classList.add('show');
+ const b=$('bub');b.innerHTML=t+'<button class="bx" data-a="bubx" aria-label="Close message">×</button>';b.classList.add('show');
  clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('show'),7000);
 }
 function say(t,log){
  if(log!==false){S.chat.push({d:S.day,t});if(S.chat.length>30)S.chat.shift();S.unread=!logOpen}
  showBub(t);
 }
+const REPN=[
+ ()=>'You might consider the Price news report, boss. For '+f(REP)+' it gives us extra daily tips on top of the ticker.',
+ ()=>'Maybe we should unlock the Price news report in the Office. It’s '+f(REP)+', and the extra tips could pay for themselves.',
+ ()=>'The Price news report would maximize our profit, boss. '+f(REP)+' gets us more tips every single day.',
+ ()=>'I’ve been thinking about the Price news report. More tips means fewer blind trades, and it’s only '+f(REP)+'.',
+ ()=>'If you ask me, boss, the Price news report is worth the '+f(REP)+'. Extra tips every day, on top of the ticker.',
+ ()=>'Have you thought about the Price news report? It’s '+f(REP)+' for extra daily tips, right there in the Office.'
+];
+function repNudge(re){
+ if(re||S.nudgeI===undefined){let i;do{i=Math.floor(Math.random()*REPN.length)}while(i===S.nudgeI&&REPN.length>1);S.nudgeI=i}
+ return REPN[S.nudgeI]();
+}
 function advice(){
  if(S.debt>0)return 'We owe '+f(S.debt)+' on credit, and interest adds '+Math.round(RATE*100)+'% to it every day. Sell some stock and repay it from the Office soon.';
- if(!S.lv.rep)return 'Unlock the Price news report in the Office for '+f(REP)+' to get extra daily tips on top of the ticker tape.';
+ if(!S.lv.rep)return repNudge();
  if(!S.upOpen)return 'Upgrades unlock once we hold '+f(UNLOCK)+' in cash. We have '+f(S.cash)+', so '+f(Math.max(0,UNLOCK-S.cash))+' to go. Buy low and sell high to get there.';
  const s=suggest();let t='';
  if(s){const need=s.c-S.cash;t=need<=0?`You can afford <b>${s.u.n}</b> (${f(s.c)}) right now. ${WHY[s.u.id]}`:`Next up: <b>${s.u.n}</b> for ${f(s.c)}. ${WHY[s.u.id]} You need ${f(need)} more.`}
@@ -247,8 +278,10 @@ function advice(){
  return t||'You’ve bought everything. Go make a fortune, boss!';
 }
 function dayAdvice(){
- if(S.lastAdv!==undefined&&S.day-S.lastAdv<4)return;
+ if(S.tutOn)return;
+ if(S.lastAdv!==undefined&&S.day-S.lastAdv<8)return;
  S.lastAdv=S.day;
+ if(!S.lv.rep&&!(S.debt>0))repNudge(true);
  if(!S.upOpen){say(advice());return}
  const s=suggest(),key=s?s.u.id+S.lv[s.u.id]:'done',fresh2=S.lastSug!==key;
  S.lastSug=key;say(advice(),fresh2);
@@ -281,13 +314,59 @@ function introStep(i){
 }
 function clearNudge(){document.querySelectorAll('nav .nudge').forEach(b=>b.classList.remove('nudge'))}
 function nudgeNav(){clearNudge();document.querySelectorAll('nav button[data-s="buy"],nav button[data-s="sell"]').forEach(b=>b.classList.add('nudge'));setTimeout(clearNudge,12000)}
-function startIntro(){$('intro').hidden=false;introStep(0)}
+const TUT=[
+ {scene:'office',sel:'#cash',btn:'Next',t:()=>'Welcome, boss! I’m Mina. We buy goods cheap and sell them for more. Let me show you.'},
+ {scene:'office',sel:'#tape',top:1,btn:'Got it',t:()=>'First, read the news. The ticker says copper prices will go up tomorrow.'},
+ {scene:'office',sel:'nav [data-s="buy"]',top:1,done:()=>S.scene==='buy',t:()=>'So let’s buy copper now, while it’s cheap. Tap Buy.'},
+ {scene:'buy',sel:'#m [data-k="copper"][data-n="max"]',enter:()=>{S.tutC=S.inv.copper},done:()=>S.inv.copper>S.tutC,t:()=>'Tap Max to buy as much copper as we can.'},
+ {scene:'buy',sel:'#m .go',done:()=>S.day>=2,t:()=>'Now end the day, so the price can move.'},
+ {scene:'office',sel:'.dr',btn:'Got it',t:()=>'Copper went up! Our stock is worth more, and the morning report shows that profit.'},
+ {scene:'office',sel:'nav [data-s="sell"]',top:1,done:()=>S.scene==='sell',t:()=>'To collect the profit, we need to sell. Tap Sell.'},
+ {scene:'sell',sel:'#m [data-k="copper"][data-n="all"]',done:()=>S.inv.copper===0,t:()=>'Sell all the copper while the price is high.'},
+ {scene:'sell',sel:'#cash',btn:'Got it',t:()=>'Look, our cash went up. That’s profit: buy low, sell high.'},
+ {scene:'office',sel:'#av',btn:'Start trading',t:()=>'I’m always here in this chat bubble if you need advice. Upgrades unlock at '+f(UNLOCK)+' in cash. Good luck, boss!'}
+];
+function forceDay1(){S.mv.copper=.25;S.tips=[{k:'copper',dir:true,sh:false,src:'Trade wire'}];S.rtips=[]}
+function tutApply(){
+ clearHl();
+ const st=TUT[S.tut];if(!st)return;
+ document.querySelectorAll(st.sel).forEach(e=>e.classList.add('hl'));
+}
+function tutFinish(){clearInterval(iTimer);iDone=true;$('itx').textContent=iText}
+function tutShow(){
+ const st=TUT[S.tut];
+ $('intro').hidden=false;$('iskip').hidden=true;
+ $('intro').querySelector('.card').classList.toggle('top',!!st.top);
+ S.scene=st.scene;mgrOpen=false;logOpen=false;
+ if(st.enter)st.enter();
+ render();
+ const b=$('inext');b.hidden=!st.btn;b.textContent=st.btn||'';
+ const e0=document.querySelector(st.sel);
+ if(e0&&e0.closest('#m')){if(S.scene==='office')$('m').scrollTop=0;else e0.scrollIntoView({block:'center'})}
+ iText=st.t();iDone=false;clearInterval(iTimer);$('itx').textContent='';
+ let n=0;
+ iTimer=setInterval(()=>{n++;$('itx').textContent=iText.slice(0,n);if(n>=iText.length)tutFinish()},26);
+}
+function tutAdvance(){
+ if(S.tut>=TUT.length-1){tutEnd();return}
+ S.tut++;save();tutShow();
+}
+function tutCheck(){
+ if(!S.tutOn)return;
+ const st=TUT[S.tut];
+ if(st&&st.done&&st.done())tutAdvance();
+}
+function tutEnd(){
+ clearInterval(iTimer);clearHl();$('intro').hidden=true;
+ S.tutOn=0;S.seen=1;S.scene='office';save();render();$('m').scrollTop=0;
+}
+function startIntro(){S.tutOn=1;S.tut=0;forceDay1();tutShow()}
 function endIntro(){
  clearInterval(iTimer);clearHl();$('intro').hidden=true;
  S.seen=1;S.scene='office';save();render();$('m').scrollTop=0;nudgeNav();
 }
-$('inext').onclick=()=>{if(!iDone)finishType();else if(iStep>=INTRO.length-1)endIntro();else introStep(iStep+1)};
-$('itx').onclick=()=>{if(!iDone)finishType()};
+$('inext').onclick=()=>{if(!iDone)tutFinish();else tutAdvance()};
+$('itx').onclick=()=>{if(!iDone)tutFinish()};
 $('iskip').onclick=endIntro;
 function scrollCue(){
  const m=$('m'),more=m.scrollHeight-m.scrollTop-m.clientHeight>8;
@@ -346,6 +425,30 @@ function renderMina(){
   lg.scrollTop=lg.scrollHeight;
  }
 }
+const OFFN=[
+ ()=>'Boss, our warehouse is bursting at the seams. A new office space for '+f(250000)+' would give us room to grow.',
+ ()=>'I’ve been looking at property listings. The new office space at '+f(250000)+' unlocks more warehouse upgrades and more porters.',
+ ()=>'Have you considered moving to a bigger office? For '+f(250000)+' we could double our porters and expand the warehouse.',
+ ()=>'Maybe it’s time we upgraded the office, boss. '+f(250000)+' opens up two more warehouse levels.',
+ ()=>'A new office space would maximize our capacity, boss. It’s '+f(250000)+', and it would let us trade much bigger.',
+ ()=>'More porters, more storage, a better address. Just a thought, boss: '+f(250000)+' and we’re moving in.'
+];
+function offNudge(){
+ let i;do{i=Math.floor(Math.random()*OFFN.length)}while(i===S.offI&&OFFN.length>1);S.offI=i;
+ return OFFN[i]()+(S.cash>=250000?' We have the cash right now.':' We’re about '+f(250000-S.cash)+' short.');
+}
+function checkNet(){
+ if(S.tutOn)return;
+ S.ms=S.ms||0;
+ while(S.ms<MS.length&&net()>=MS[S.ms]){
+  const m=MS[S.ms];S.ms++;
+  let t='Milestone '+S.ms+' of '+MS.length+': our net worth passed '+f(m)+'! ';
+  if(S.ms===2&&(S.offFrom=S.day))t+='You can now buy a new office space for '+f(250000)+' in the Upgrades. It unlocks 2 more warehouse upgrades and lets us hire twice as many porters.';
+  else if(S.ms<MS.length)t+='Next goal: '+f(MS[S.ms])+'.';
+  else t+='That was the last one. You’re the king of the harbour!';
+  say(t);snd('up');
+ }
+}
 function checkMilestone(){
  if(S.upOpen||S.cash<UNLOCK)return;
  S.upOpen=1;S.lastAdv=-99;save();
@@ -359,7 +462,7 @@ function checkMilestone(){
 }
 function suggest(){
  let best=null;
- for(const u of UP){const l=S.lv[u.id];if(l>=u.c.length)continue;if(!best||u.c[l]<best.c)best={u,c:u.c[l]}}
+ for(const u of UP){const l=S.lv[u.id];if(l>=mx(u)||(u.id==='off'&&S.ms<2))continue;if(!best||u.c[l]<best.c)best={u,c:u.c[l]}}
  return best;
 }
 function assistant(){
@@ -370,7 +473,7 @@ function assistant(){
  if(wage()>0&&S.cash<wage()*2)h+=`<div class="asst"><span class="av">💁</span><div><b>Mina</b><br>Careful, boss: cash is low and tonight’s wages are ${f(wage())}.</div></div>`;
  return h;
 }
-let lastTape='';
+let lastTape='',repT,repT0=0;
 function renderTape(){
  let html;
  html=S.tips.map(t=>`<span class="ti${t.sh?' bad':''}">${C[t.k].e}<b class="ar ${t.dir?'up':'dn'}">${t.dir?'▲':'▼'}</b>${NEWS[t.k][t.dir?0:1]}<i>${t.sh?'Unconfirmed: ':''}${t.src}</i></span>`).join('');
@@ -384,7 +487,27 @@ function debtCard(){
  const can=Math.min(S.cash,S.debt);
  return`<div class="slip lock debt"><b>Debt: ${f(S.debt)}</b><small>Interest adds ${Math.round(RATE*100)}% to this every day, and it compounds.</small><button class="go" data-a="repay"${can>0?'':' disabled'}>Repay ${f(can)}</button></div>`;
 }
+function duesRow(){
+ const nd=(Math.floor(S.day/120)+1)*120,d=nd-S.day,est=Math.max(300,Math.round(net()*TAXR));
+ return`<div class="rr"><div>⚓ Next harbour dues<small>In ${d} day${d===1?'':'s'}, on day ${nd}</small></div><b>~${f(est)}</b></div>`;
+}
 function dayReport(){
+ const r=S.rep;
+ if(!r||r.day!==S.day)return '';
+ let tot=0;
+ const rows=r.rows.map(x=>{const d=x.q*(x.b-x.a);tot+=d;return`<div class="rr"><div>${C[x.k].e} ${C[x.k].n} × ${x.q}<small>${f(x.a)} to ${f(x.b)} (${pct(x.b/x.a-1)})</small></div><b class="${d>=0?'up':'dn'}">${d>=0?'+':'−'}${f(Math.abs(d))}</b></div>`}).join('');
+ const cl=tot>=0?'up':'dn',amt=(tot>=0?'+':'−')+f(Math.abs(tot)),fl=r.day>=3&&Date.now()-repT0<2000?' flashv':'';
+ let h=`<div class="dr"><button class="drh" data-a="drt"><b>Morning report, day ${r.day}</b><span class="hr"><span class="hc ${cl}${fl}">${amt}</span><span class="chev">${S.repOpen?'▴':'▾'}</span></span></button>`;
+ if(S.repOpen){
+  h+=rows||'<div class="rr"><span class="mu">You aren’t holding any stock.</span></div>';
+  h+=`<div class="rr tot"><span>Holdings change</span><b class="hc ${cl}${fl}">${amt}</b></div>`;
+  h+=(r.tx||r.txs)?`<div class="rr"><span>Harbour dues</span><b class="dn">−${f((r.tx||0)+(r.txs||0))}</b></div>${r.txs?`<div class="rr"><span>Borrowed for dues</span><b class="dn">${f(r.txs)}</b></div>`:''}`:'';
+  if(S.day>=45)h+=duesRow();
+  h+=`${r.w?`<div class="rr"><span>Wages paid</span><b class="dn">−${f(r.w)}</b></div>`:''}${r.sf?`<div class="rr"><span>Borrowed for wages</span><b class="dn">${f(r.sf)}</b></div>`:''}${r.i?`<div class="rr"><span>Interest added to debt</span><b class="dn">+${f(r.i)}</b></div>`:''}${r.debt?`<div class="rr tot"><span>Total debt</span><b class="dn">${f(r.debt)}</b></div>`:''}<div class="rr tot"><span>Net worth now</span><b>${f(net())}</b></div>`;
+ }
+ return h+'</div>';
+}
+function dayReportOld(){
  const r=S.rep;
  if(!r||r.day!==S.day)return '';
  let tot=0;
@@ -397,7 +520,7 @@ function repHead(){
  return h;
 }
 function office(){
- let h='<h2>Office</h2><p class="mu">Check the price news report, then trade and end the day. Slips from unreliable sources are usually wrong, but not always.</p>';
+ let h='<h2>Office'+(S.lv.off?' HQ':'')+'</h2><p class="mu">Read the news, trade, then end the day.</p>';
  if(S.msg)h+=`<div class="note">${S.msg}</div>`;
  h+=dayReport();
  h+=debtCard();
@@ -407,11 +530,11 @@ function office(){
  const have=unl().filter(k=>S.inv[k]>0);
  h+=have.length?have.map(k=>{const tot=(S.p[k]*(1-fee())-S.cost[k]/S.inv[k])*S.inv[k];return`<div class="row hold" data-s="sell"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b> × ${S.inv[k]}<div class="mu" style="margin:0">Worth ${f(S.inv[k]*S.p[k])}</div></div><span class="${tot>=0?'up':'dn'}">${tot>=0?'+':'−'}${f(Math.abs(tot))}</span></div>`}).join(''):'<p class="mu">Storage is empty. Visit the Buy scene.</p>';
  h+='<h3 id="upg-h">Upgrades</h3><p class="mu" style="margin-top:0">'+(S.upOpen?'Tip accuracy and fees improve as you invest.':'🔒 Locked until you hold '+f(UNLOCK)+' in cash. You have '+f(S.cash)+' so far.')+'</p>';
- h+=UP.map(u=>{
-  const l=S.lv[u.id],done=l>=u.c.length;
+ h+=UP.filter(u=>u.id!=='off'||S.ms>=2).map(u=>{
+  const l=S.lv[u.id],done=l>=mx(u);
   return`<div class="row upg" data-u="${u.id}"><div class="t"><b>${u.n}${u.c.length>1?' (level '+l+')':''}</b><div class="mu" style="margin:0">${u.d}</div></div>${done?'<span class="mu">Owned</span>':`<button class="b" data-a="up" data-k="${u.id}" ${!S.upOpen||S.cash<u.c[l]?'disabled':''}>${S.upOpen?'':'🔒 '}${f(u.c[l])}</button>`}</div>`;
  }).join('');
-  h+='<div class="dbg"><small>Debug tools: add money</small><button class="b" data-a="dbg" data-n="1000">+$1,000</button><button class="b" data-a="dbg" data-n="5000">+$5,000</button><button class="b" data-a="dbg" data-n="50000">+$50,000</button></div>';
+  h+='<div class="dbg"><small>Debug tools: add money</small><button class="b" data-a="dbg" data-n="1000">+$1,000</button><button class="b" data-a="dbg" data-n="5000">+$5,000</button><button class="b" data-a="dbg" data-n="50000">+$50,000</button><button class="b" data-a="dbgnudge">Mina report nudge</button><button class="b" data-a="dbgskip">Skip 10 days</button><button class="b" data-a="dbgoff">Office nudge</button><button class="b" data-a="dbgzero">Zero cash</button><button class="b" data-a="dbgday">Skip 1 day</button></div>';
  h+='<button class="reset" data-a="mute">Sound: '+(S.mute?'off':'on')+'</button> ';
  h+='<button class="reset" data-a="reset">'+(confirmReset?'Tap again to erase your progress':'Start a new game')+'</button>';
  return h;
@@ -439,18 +562,19 @@ function sellScene(){
  return h;
 }
 function render(){
- if(S.scene==='market')S.scene='buy';
+ if(S.scene==='market')S.scene='buy';checkNet();
  $('day').textContent='Day '+S.day;
  const el=$('cash'),old=lastCash;el.textContent=f(S.cash);
  if(old!==undefined&&old!==S.cash){el.classList.remove('fl','fd');void el.offsetWidth;el.classList.add(S.cash>old?'fl':'fd')}
  lastCash=S.cash;renderMina();renderTape();
  $('stock').textContent='Stock '+units()+' / '+cap()+(S.debt>0?', debt '+f(S.debt):'');
- $('net').textContent='Net worth '+f(net())+' of '+f(GOAL);
+ $('net').textContent='Net worth '+f(net())+(S.ms>=MS.length?' (all milestones done)':' of '+f(MS[S.ms||0]));
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.scene));
  if(S.scene!=='office')clearNudge();
  const y=$('m').scrollTop;
  $('m').innerHTML=S.scene==='office'?office():S.scene==='buy'?buyScene():sellScene();
  $('m').scrollTop=y;scrollCue();
+ if(S.tutOn)tutApply();
  if(S.day===1&&S.seen&&S.scene!=='office'){
   if(!S.endHint){S.endHint=1;save();setTimeout(()=>say('When you’re done trading, tap End day to move on to the next morning.'),1200)}
   document.querySelectorAll('#m .go').forEach(b=>b.classList.add('fl2'));
@@ -458,7 +582,7 @@ function render(){
 }
 document.addEventListener('click',e=>{
  const s=e.target.closest('[data-s]');
- if(s){confirmReset=false;S.cheer='';S.scene=s.dataset.s;$('m').scrollTop=0;render();return}
+ if(s){confirmReset=false;S.cheer='';S.scene=s.dataset.s;$('m').scrollTop=0;render();tutCheck();return}
  const b=e.target.closest('[data-a]');
  if(!b)return;
  const a=b.dataset.a,k=b.dataset.k,n=isNaN(b.dataset.n)?b.dataset.n:+b.dataset.n;
@@ -468,15 +592,22 @@ document.addEventListener('click',e=>{
  else if(a==='up')upgrade(k);
  else if(a==='hire')hire(k);
  else if(a==='fire')fire(k);
+ else if(a==='drt'){if(!S.tutOn){clearTimeout(repT);S.repOpen=!S.repOpen}}
  else if(a==='repay'){const p=Math.min(S.cash,S.debt);if(p>0){S.cash-=p;S.debt-=p;say(S.debt>0?'Paid off '+f(p)+', boss. We still owe '+f(S.debt)+'.':'Debt cleared, boss! No more interest.');snd('sell')}}
  else if(a==='rep'){if(!S.lv.rep&&S.cash>=REP){S.cash-=REP;S.lv.rep=1;say('Price news report unlocked, boss! You now get extra tips here every day. Check the sources, because some are unreliable.');snd('up')}}
  else if(a==='mgr'){mgrOpen=!mgrOpen;if(mgrOpen)logOpen=false}
  else if(a==='mina'){logOpen=!logOpen;S.unread=false;if(logOpen){$('bub').classList.remove('show');mgrOpen=false}}
  else if(a==='mute'){S.mute=!S.mute;snd('buy')}
  else if(a==='dbg'){S.cash+=n;snd('sell');checkMilestone()}
+ else if(a==='dbgnudge'){say(repNudge(true),false)}
+ else if(a==='dbgoff'){say(offNudge(),false)}
+ else if(a==='bubx'){$('bub').classList.remove('show')}
+ else if(a==='dbgzero'){S.cash=0;snd('fire')}
+ else if(a==='dbgday'){if(!S.tutOn)endDay()}
+ else if(a==='dbgskip'){if(!S.tutOn){const mm=S.mute;S.mute=true;for(let i=0;i<10;i++)endDay();S.mute=mm;snd('day')}}
  else if(a==='end'){endDay();$('m').scrollTop=0}
  else if(a==='reset'){if(!confirmReset){confirmReset=true;render();return}confirmReset=false;fresh();setTimeout(startIntro,50)}
- save();render();
+ save();render();tutCheck();
 });
 try{const r=localStorage.getItem('hl1');if(r)S=JSON.parse(r)}catch(e){}
 if(!S||!S.lv)fresh();
@@ -484,7 +615,9 @@ if(!S.staff)S.staff={scout:0,porter:0};
 if(!S.chat)S.chat=[];
 if(S.lv.rep===undefined)S.lv.rep=1;
 if(!S.debt)S.debt=0;
+if(!S.lv.off)S.lv.off=0;
+if(!S.ms)S.ms=0;
 if(S.upOpen===undefined)S.upOpen=(S.day>1||Object.values(S.lv).some(x=>x>0))?1:0;
 render();
-if(S.day===1&&!S.seen)startIntro();
+if(S.tutOn)tutShow();else if(S.day===1&&!S.seen)startIntro();
 </script></body></html>
