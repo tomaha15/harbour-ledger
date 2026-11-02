@@ -41,6 +41,8 @@ nav button span{font-size:22px;line-height:1}
 nav button:active{transform:translateY(3px);box-shadow:0 0 0 var(--brass)}
 nav button.on{background:var(--brass);color:var(--bg);box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .hold{cursor:pointer}.hold:active{opacity:.6}
+.risk{display:block;color:var(--rust);font-size:12px;font-weight:600}
+.dbg small{user-select:none;-webkit-user-select:none;opacity:.55}
 .bx{position:absolute;top:-12px;right:-8px;width:28px;height:28px;border-radius:50%;border:2px solid var(--brass);background:var(--card);color:var(--ink);font:700 18px/1 "DM Sans",sans-serif;padding:0}
 .hr{display:flex;align-items:center;gap:10px}
 .chev{font-size:26px;line-height:1;color:var(--mu);font-weight:400}
@@ -132,8 +134,8 @@ header .mg{flex-direction:column;align-items:flex-end;gap:0;width:auto;margin:0 
 <div id="intro" hidden><div class="dim"></div><div class="card"><div class="ih"><span class="av2">💁</span><b>Mina</b><button class="x" id="iskip">Skip</button></div><p id="itx"></p><button class="go" id="inext">Next</button></div></div>
 <div id="mina"><div id="bub" data-a="mina"></div><button id="av" data-a="mina" aria-label="Mina, your assistant">💁<i id="dot" hidden></i></button></div>
 <script>
-const C={wheat:{n:'Wheat',e:'🌾',b:20},copper:{n:'Copper',e:'🔩',b:45},coffee:{n:'Coffee',e:'☕',b:90},oil:{n:'Oil',e:'🛢️',b:160},gold:{n:'Gold',e:'🪙',b:400}};
-const NEWS={wheat:['Dry spell worries farmers','Record harvest fills the silos'],copper:['Factory orders surge overseas','Mine strike ends, supply returns'],coffee:['Frost hits the coffee highlands','Bumper crop ships from Brazil'],oil:['Pipeline outage cuts supply','Tankers pile up at the port'],gold:['Markets jittery, buyers want bullion','Calm returns, investors sell gold']};
+const C={wheat:{n:'Wheat',e:'🌾',b:20},copper:{n:'Copper',e:'🔩',b:45},coffee:{n:'Coffee',e:'☕',b:90},oil:{n:'Oil',e:'🛢️',b:160},gold:{n:'Gold',e:'🪙',b:400},gas:{n:'Natural gas',e:'🔥',b:150,lo:.3,hi:4,vol:1.8,risk:1}};
+const NEWS={wheat:['Dry spell worries farmers','Record harvest fills the silos'],copper:['Factory orders surge overseas','Mine strike ends, supply returns'],coffee:['Frost hits the coffee highlands','Bumper crop ships from Brazil'],oil:['Pipeline outage cuts supply','Tankers pile up at the port'],gold:['Markets jittery, buyers want bullion','Calm returns, investors sell gold'],gas:['Cold snap sends heating demand soaring','Warm spell leaves gas tanks overflowing']};
 const GOOD=['Trade wire','Morning paper','Harbour Times'],BAD=['Anonymous blog','Social media chatter','Unnamed source','Online forum'];
 const UP=[
 {id:'cap',n:'Warehouse',d:'+20 storage space',c:[300,700,1400,2600,4500,40000,120000]},
@@ -142,15 +144,16 @@ const UP=[
 {id:'coffee',n:'Unlock coffee',d:'New commodity, bigger prices',c:[900]},
 {id:'oil',n:'Unlock oil',d:'Pricey and volatile',c:[3000]},
 {id:'gold',n:'Unlock gold',d:'The big money',c:[8000]},
+{id:'gas',n:'Unlock natural gas',d:'Risky trade: wild price swings',c:[6000]},
 {id:'off',n:'New office space',d:'+2 warehouse upgrades, double porter limit',c:[250000]}];
-const WHY={cap:'More storage lets you carry more stock into each trade.',news:'Better tips mean fewer losing trades.',broker:'A lower fee keeps more of every sale.',coffee:'A pricier commodity makes each trade earn more.',oil:'Oil is pricey and swings a lot, so profits can be big.',gold:'Gold is the most valuable commodity in the harbour.',off:'A bigger office unlocks two more warehouse upgrades and lets us hire twice as many porters.'};
-const YAY={cap:()=>`Storage is now ${cap()} units, so you can carry more stock into each trade.`,news:()=>`Tips are now right about ${Math.round(acc()*100)}% of the time.`,broker:()=>`Selling fee is down to ${(fee()*100).toFixed(1)}%, so you keep more of every sale.`,coffee:()=>'Coffee is now on the Buy scene. It costs more per unit, so each trade can earn more.',oil:()=>'Oil is now on sale. Prices are high and swings are big.',gold:()=>'Gold is now on sale, the most valuable commodity in the harbour.',off:()=>'Our new office is open! Two more warehouse upgrades are unlocked, and we can now hire up to 8 porters.'};
+const WHY={cap:'More storage lets you carry more stock into each trade.',news:'Better tips mean fewer losing trades.',broker:'A lower fee keeps more of every sale.',coffee:'A pricier commodity makes each trade earn more.',oil:'Oil is pricey and swings a lot, so profits can be big.',gold:'Gold is the most valuable commodity in the harbour.',off:'A bigger office unlocks two more warehouse upgrades and lets us hire twice as many porters.',gas:'Natural gas swings wildly, so it can pay big or cost big.'};
+const YAY={cap:()=>`Storage is now ${cap()} units, so you can carry more stock into each trade.`,news:()=>`Tips are now right about ${Math.round(acc()*100)}% of the time.`,broker:()=>`Selling fee is down to ${(fee()*100).toFixed(1)}%, so you keep more of every sale.`,coffee:()=>'Coffee is now on the Buy scene. It costs more per unit, so each trade can earn more.',oil:()=>'Oil is now on sale. Prices are high and swings are big.',gold:()=>'Gold is now on sale, the most valuable commodity in the harbour.',off:()=>'Our new office is open! Two more warehouse upgrades are unlocked, and we can now hire up to 8 porters.',gas:()=>'Natural gas is now on sale. It’s a risky trade with wild swings, so watch your tips.'};
 const FEES=[.025,.015,.01,.005],GOAL=Infinity,UNLOCK=4000,REP=5000,RATE=.05,TAXR=.06,MS=[20000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000,50000000];
 let S,confirmReset=false;
 const $=id=>document.getElementById(id);
 const f=n=>'$'+Math.round(n).toLocaleString('en-US');
 const pct=x=>(x>0?'+':'')+Math.round(x*100)+'%';
-const unl=()=>['wheat','copper'].concat(['coffee','oil','gold'].filter(k=>S.lv[k]));
+const unl=()=>['wheat','copper'].concat(['coffee','oil','gold','gas'].filter(k=>S.lv[k]));
 const cap=()=>40+20*S.lv.cap+15*S.staff.porter;
 const mx=u=>u.id==='cap'&&!S.lv.off?5:u.c.length;
 const wage=()=>S.staff.scout*40+S.staff.porter*25;
@@ -160,7 +163,7 @@ const fee=()=>FEES[S.lv.broker];
 const net=()=>S.cash+Object.keys(C).reduce((a,k)=>a+S.inv[k]*S.p[k],0)-(S.debt||0);
 function save(){try{localStorage.setItem('hl1',JSON.stringify(S))}catch(e){}}
 function fresh(){
- S={day:1,cash:3000,upOpen:0,debt:0,ms:0,scene:'office',msg:'',won:0,p:{},prev:{},mv:{},inv:{},cost:{},tips:[],chat:[{d:1,t:'Welcome to the harbour, boss! I’ve put 10 wheat and 5 copper in storage to get you started. Tap me any time for advice and my past messages.'}],staff:{scout:0,porter:0},lv:{rep:0,off:0,cap:0,news:0,broker:0,coffee:0,oil:0,gold:0}};
+ S={day:1,cash:3000,upOpen:0,debt:0,ms:0,scene:'office',msg:'',won:0,p:{},prev:{},mv:{},inv:{},cost:{},tips:[],chat:[{d:1,t:'Welcome to the harbour, boss! I’ve put 10 wheat and 5 copper in storage to get you started. Tap me any time for advice and my past messages.'}],staff:{scout:0,porter:0},lv:{rep:0,off:0,gas:0,cap:0,news:0,broker:0,coffee:0,oil:0,gold:0}};
  for(const k in C){S.p[k]=S.prev[k]=C[k].b;S.inv[k]=0;S.cost[k]=0}
  S.inv.wheat=10;S.cost.wheat=200;S.inv.copper=5;S.cost.copper=225;
  plan();
@@ -168,7 +171,7 @@ function fresh(){
 function plan(){
  for(const k in C){
   const pUp=Math.min(.8,Math.max(.2,.5-(S.p[k]/C[k].b-1)*.35));
-  S.mv[k]=(Math.random()<pUp?1:-1)*(.12+Math.random()*.18);
+  S.mv[k]=(Math.random()<pUp?1:-1)*(.12+Math.random()*.18)*(C[k].vol||1);
  }
  const N=unl().length,lo=Math.ceil(Math.min(1,.5+.15*S.staff.scout)*N),cnt=lo+Math.floor(Math.random()*(N-lo+1)),ks=unl().sort(()=>Math.random()-.5).slice(0,cnt);
  S.rtips=mkReport();
@@ -189,7 +192,7 @@ function endDay(){
  const out=[];
  for(const k of unl()){
   S.prev[k]=S.p[k];
-  S.p[k]=Math.max(1,Math.round(Math.min(C[k].b*2.5,Math.max(C[k].b*.5,S.p[k]*(1+S.mv[k])))));
+  S.p[k]=Math.max(1,Math.round(Math.min(C[k].b*(C[k].hi||2.5),Math.max(C[k].b*(C[k].lo||.5),S.p[k]*(1+S.mv[k])))));
   out.push(C[k].n+' '+pct(S.p[k]/S.prev[k]-1));
  }
  for(const k in C)if(!unl().includes(k)){S.prev[k]=S.p[k]}
@@ -473,7 +476,7 @@ function assistant(){
  if(wage()>0&&S.cash<wage()*2)h+=`<div class="asst"><span class="av">💁</span><div><b>Mina</b><br>Careful, boss: cash is low and tonight’s wages are ${f(wage())}.</div></div>`;
  return h;
 }
-let lastTape='',repT,repT0=0;
+let lastTape='',repT,repT0=0,dbgOn=(()=>{try{return localStorage.getItem('hl_dbg')==='1'}catch(e){return false}})(),dbgT=[];
 function renderTape(){
  let html;
  html=S.tips.map(t=>`<span class="ti${t.sh?' bad':''}">${C[t.k].e}<b class="ar ${t.dir?'up':'dn'}">${t.dir?'▲':'▼'}</b>${NEWS[t.k][t.dir?0:1]}<i>${t.sh?'Unconfirmed: ':''}${t.src}</i></span>`).join('');
@@ -534,7 +537,7 @@ function office(){
   const l=S.lv[u.id],done=l>=mx(u);
   return`<div class="row upg" data-u="${u.id}"><div class="t"><b>${u.n}${u.c.length>1?' (level '+l+')':''}</b><div class="mu" style="margin:0">${u.d}</div></div>${done?'<span class="mu">Owned</span>':`<button class="b" data-a="up" data-k="${u.id}" ${!S.upOpen||S.cash<u.c[l]?'disabled':''}>${S.upOpen?'':'🔒 '}${f(u.c[l])}</button>`}</div>`;
  }).join('');
-  h+='<div class="dbg"><small>Debug tools: add money</small><button class="b" data-a="dbg" data-n="1000">+$1,000</button><button class="b" data-a="dbg" data-n="5000">+$5,000</button><button class="b" data-a="dbg" data-n="50000">+$50,000</button><button class="b" data-a="dbgnudge">Mina report nudge</button><button class="b" data-a="dbgskip">Skip 10 days</button><button class="b" data-a="dbgoff">Office nudge</button><button class="b" data-a="dbgzero">Zero cash</button><button class="b" data-a="dbgday">Skip 1 day</button></div>';
+  h+='<div class="dbg"><small data-a="dbgh">Debug tools'+(dbgOn?' (tap 5 times to hide)':'')+'</small>'+(dbgOn?'<button class="b" data-a="dbg" data-n="1000">+$1,000</button><button class="b" data-a="dbg" data-n="5000">+$5,000</button><button class="b" data-a="dbg" data-n="50000">+$50,000</button><button class="b" data-a="dbgnudge">Mina report nudge</button><button class="b" data-a="dbgskip">Skip 10 days</button><button class="b" data-a="dbgoff">Office nudge</button><button class="b" data-a="dbgzero">Zero cash</button><button class="b" data-a="dbgday">Skip 1 day</button>':'')+'</div>';
  h+='<button class="reset" data-a="mute">Sound: '+(S.mute?'off':'on')+'</button> ';
  h+='<button class="reset" data-a="reset">'+(confirmReset?'Tap again to erase your progress':'Start a new game')+'</button>';
  return h;
@@ -543,7 +546,7 @@ function buyScene(){
  let h='<h2>Buy</h2><p class="mu">Today’s prices. Storage: '+units()+' / '+cap()+'.</p>';
  h+=unl().map(k=>{
   const ch=S.p[k]/S.prev[k]-1;
-  return`<div class="row"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b><div>${f(S.p[k])} <span class="${ch>=0?'up':'dn'}">${pct(ch)}</span></div><div class="mu" style="margin:0">Own ${S.inv[k]}${S.inv[k]?(()=>{const t=(S.p[k]*(1-fee())-S.cost[k]/S.inv[k])*S.inv[k];return`, <span class="${t>=0?'up':'dn'}">${t>=0?'profit':'loss'} ${f(Math.abs(t))}</span>`})():''}</div></div><div class="btns"><button class="b" data-a="buy" data-k="${k}" data-n="1">+1</button><button class="b" data-a="buy" data-k="${k}" data-n="10">+10</button><button class="b" data-a="buy" data-k="${k}" data-n="max">Max</button></div></div>`;
+  return`<div class="row"><span class="i">${C[k].e}</span><div class="t"><b>${C[k].n}</b>${C[k].risk?'<small class="risk">⚠ Risky trade: wild price swings</small>':''}<div>${f(S.p[k])} <span class="${ch>=0?'up':'dn'}">${pct(ch)}</span></div><div class="mu" style="margin:0">Own ${S.inv[k]}${S.inv[k]?(()=>{const t=(S.p[k]*(1-fee())-S.cost[k]/S.inv[k])*S.inv[k];return`, <span class="${t>=0?'up':'dn'}">${t>=0?'profit':'loss'} ${f(Math.abs(t))}</span>`})():''}</div></div><div class="btns"><button class="b" data-a="buy" data-k="${k}" data-n="1">+1</button><button class="b" data-a="buy" data-k="${k}" data-n="10">+10</button><button class="b" data-a="buy" data-k="${k}" data-n="max">Max</button></div></div>`;
  }).join('');
  h+='<button class="go" data-a="end">End day</button>';
  return h;
@@ -602,6 +605,7 @@ document.addEventListener('click',e=>{
  else if(a==='dbgnudge'){say(repNudge(true),false)}
  else if(a==='dbgoff'){say(offNudge(),false)}
  else if(a==='bubx'){$('bub').classList.remove('show')}
+ else if(a==='dbgh'){const tm=Date.now();dbgT=dbgT.filter(x=>tm-x<2000);dbgT.push(tm);if(dbgT.length>=5){dbgT=[];dbgOn=!dbgOn;try{localStorage.setItem('hl_dbg',dbgOn?'1':'0')}catch(e){}}}
  else if(a==='dbgzero'){S.cash=0;snd('fire')}
  else if(a==='dbgday'){if(!S.tutOn)endDay()}
  else if(a==='dbgskip'){if(!S.tutOn){const mm=S.mute;S.mute=true;for(let i=0;i<10;i++)endDay();S.mute=mm;snd('day')}}
@@ -616,6 +620,8 @@ if(!S.chat)S.chat=[];
 if(S.lv.rep===undefined)S.lv.rep=1;
 if(!S.debt)S.debt=0;
 if(!S.lv.off)S.lv.off=0;
+if(!S.lv.gas)S.lv.gas=0;
+for(const k in C){if(S.p[k]===undefined){S.p[k]=S.prev[k]=C[k].b;S.inv[k]=0;S.cost[k]=0;S.mv[k]=0}}
 if(!S.ms)S.ms=0;
 if(S.upOpen===undefined)S.upOpen=(S.day>1||Object.values(S.lv).some(x=>x>0))?1:0;
 render();
